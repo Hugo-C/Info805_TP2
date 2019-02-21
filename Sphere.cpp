@@ -91,6 +91,32 @@ rt::Sphere::getMaterial( Point3 /* p */ )
 rt::Real
 rt::Sphere::rayIntersection( const Ray& ray, Point3& p )
 {
-  // TO DO
-  return 1.0f;
+    Vector3 pc = Vector3(center[0] - ray.origin[0], center[1] - ray.origin[1], center[2] - ray.origin[2]);
+    Vector3 pq = pc.dot(ray.direction) * ray.direction;
+    Vector3 qc = pc - pq;
+    Real distance2 = qc.dot(qc);
+    Real radius2 = radius * radius;
+    if (distance2 > radius2)
+        return 1.0f;  // no intersect with the sphere
+
+    Real b = 2 * (ray.direction.dot(pc));
+    Real discriminant = b * b - 4 * (pc.dot(pc) - radius2) * (pc.dot(pc) - radius2);
+    if(discriminant < 0.f){
+        std::cout << "discriminant is negative : " << discriminant << " ||pc|| : " << pc.dot(pc) << std::endl;
+        //return 1.0f;
+    }
+
+
+    Real disSqrt = static_cast<Real>(sqrt(discriminant));
+
+    Real t1 = (-b - disSqrt) / 2.0f;
+    Real t2 = (-b + disSqrt) / 2.0f;
+    if (t1 < 0.f && t2 < 0.f)
+        return 1.0f;  // the ray start after the sphere
+
+    Real t = t1 > 0 ? t1 : t2;
+    p = Point3(ray.origin[0] + ray.direction[0] * t,
+               ray.origin[1] + ray.direction[1] * t,
+               ray.origin[2] + ray.direction[2] * t);
+    return -1.0f;
 }
