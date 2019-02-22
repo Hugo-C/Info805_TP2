@@ -12,7 +12,8 @@ QMAKE_CXXFLAGS += -std=c++11
 
 # Noms de vos fichiers entete
 HEADERS = Viewer.h PointVector.h Color.h Sphere.h GraphicalObject.h Light.h \
-          Material.h PointLight.h Image2D.h Image2DWriter.h Renderer.h Ray.h
+          Material.h PointLight.h Image2D.h Image2DWriter.h Renderer.h Ray.h \
+          Scene.h
           
 # Noms de vos fichiers source
 SOURCES = Viewer.cpp ray-tracer.cpp Sphere.cpp 
@@ -27,9 +28,14 @@ SOURCES = Viewer.cpp ray-tracer.cpp Sphere.cpp
 ## LIBS *= -L/usr/lib/x86_64-linux-gnu -lqglviewer-qt4
 
 # Exemple de configuration MacOSX avec macports
-INCLUDEPATH *= /opt/local/include
-LIBS *= -L/opt/local/lib -lQGLViewer 
+#INCLUDEPATH *= /opt/local/include
+#LIBS *= -L/opt/local/lib -lQGLViewer
 
 # Exemple de configuration MacOSX avec frameworks
 ##  INCLUDEPATH *= /Users/login/libQGLViewer-2.6.4
 ##  LIBS *= -F/Users/login/Library/Frameworks -framework QGLViewer
+
+#Windows :
+LIBS *= -lopengl32 -lglu32
+INCLUDEPATH *= D:\Cours\Info805\libQGLViewer-2.7.1
+LIBS *= -LD:\Cours\Info805\libQGLViewer-2.7.1\QGLViewer -lQGLViewer2

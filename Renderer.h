@@ -6,9 +6,15 @@
 #ifndef _RENDERER_H_
 #define _RENDERER_H_
 
+#include <cmath>
 #include "Color.h"
 #include "Image2D.h"
 #include "Ray.h"
+#include "Viewer.h"
+#include "GraphicalObject.h"
+#include "PointVector.h"
+#include "Scene.h"
+
 
 /// Namespace RayTracer
 namespace rt {
@@ -131,6 +137,15 @@ namespace rt {
         return Color(0.0, 0.0, 0.0); // some background color
       Material m_i = obj_i->getMaterial(p_i);
       return m_i.ambient + m_i.diffuse;;
+    }
+
+    /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
+    Color illumination( const Ray& ray, GraphicalObject* obj, Point3 p ){
+        Material m = obj->getMaterial(p);
+        Color c;
+        for (auto l : ptrScene->myLights){
+            Vector3 d = l->direction(p);
+        }
     }
 
   };
