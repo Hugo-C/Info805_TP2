@@ -14,7 +14,7 @@
 /// Namespace RayTracer
 namespace rt {
 
-  /**
+/**
   Models a scene, i.e. a collection of lights and graphical objects
   (could be a tree, but we keep a list for now for the sake of
   simplicity).
@@ -23,7 +23,7 @@ namespace rt {
   is thus responsible for its deallocation.
   */
 
-  struct Scene {
+struct Scene {
     /// The list of lights modelled as a vector.
     std::vector< Light* > myLights;
     /// The list of objects modelled as a vector.
@@ -33,48 +33,48 @@ namespace rt {
     Scene() {}
 
     /// Destructor. Frees objects.
-    ~Scene() 
+    ~Scene()
     {
-      for ( Light* light : myLights )
-        delete light;
-      for ( GraphicalObject* obj : myObjects )
-        delete obj;
-      // The vector is automatically deleted.
+        for ( Light* light : myLights )
+            delete light;
+        for ( GraphicalObject* obj : myObjects )
+            delete obj;
+        // The vector is automatically deleted.
     }
 
     /// This function calls the init method of each of its objects.
     void init( Viewer& viewer )
     {
-      for ( GraphicalObject* obj : myObjects )
-        obj->init( viewer );
-      for ( Light* light : myLights )
-        light->init( viewer );
+        for ( GraphicalObject* obj : myObjects )
+            obj->init( viewer );
+        for ( Light* light : myLights )
+            light->init( viewer );
     }
     /// This function calls the draw method of each of its objects.
     void draw( Viewer& viewer )
     {
-      for ( GraphicalObject* obj : myObjects )
-        obj->draw( viewer );
-      for ( Light* light : myLights )
-        light->draw( viewer );
+        for ( GraphicalObject* obj : myObjects )
+            obj->draw( viewer );
+        for ( Light* light : myLights )
+            light->draw( viewer );
     }
     /// This function calls the light method of each of its lights
     void light(Viewer& viewer )
     {
-      for ( Light* light : myLights )
-        light->light( viewer );
+        for ( Light* light : myLights )
+            light->light( viewer );
     }
 
     /// Adds a new object to the scene.
     void addObject( GraphicalObject* anObject )
     {
-      myObjects.push_back( anObject );
+        myObjects.push_back( anObject );
     }
 
     /// Adds a new light to the scene.
     void addLight( Light* aLight )
     {
-      myLights.push_back( aLight );
+        myLights.push_back( aLight );
     }
     
     /// returns the closest object intersected by the given ray.
@@ -82,31 +82,33 @@ namespace rt {
     rayIntersection( const Ray& ray,
                      GraphicalObject*& object, Point3& p )
     {
-      Real minDistance = -1.f;
-      Point3 pTmp;
+        Real minDistance = 0.0f;
+        Point3 pTmp;
+        bool hasTouch = false;
 
-//        std::cout << "wow : " << myObjects.size() << std::endl;
+        //        std::cout << "wow : " << myObjects.size() << std::endl;
         for (unsigned long i = 0; i < myObjects.size(); i++) {
-          if(myObjects.at(i)->rayIntersection(ray, pTmp) > 0.f){
-              Real dTmp = distance(ray.origin, pTmp);
-              if(minDistance == -1.f || dTmp < minDistance){
-                minDistance = dTmp;
-                object = myObjects.at(i);
-                p = pTmp;
-//                if(i == 1)
-//                    std::cout << "wow : " << minDistance << " : " << i << " p : " << pTmp << std::endl;
-              }
-         }
-      }
-      return minDistance;
-    }
+            if(myObjects.at(i)->rayIntersection(ray, pTmp) < 0.f){
+                Real dTmp = distance2(ray.origin, pTmp);
+                if(!hasTouch || dTmp < minDistance){
+                    hasTouch = true;
+                    minDistance = dTmp;
+                    object = myObjects.at(i);
+                    p = pTmp;
+                    if(i == 1)
+                        std::cout << "wow : " << minDistance << " : " << i << " p : " << pTmp << std::endl;
+                    }
+                }
+            }
+            return hasTouch ? -1.0f : 1.0f;
+        }
 
-  private:
-    /// Copy constructor is forbidden.
-    Scene( const Scene& ) = delete;
-    /// Assigment is forbidden.
-    Scene& operator=( const Scene& ) = delete;
-  };
+        private:
+        /// Copy constructor is forbidden.
+        Scene( const Scene& ) = delete;
+        /// Assigment is forbidden.
+        Scene& operator=( const Scene& ) = delete;
+    };
 
 } // namespace rt
 
