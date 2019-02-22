@@ -88,20 +88,18 @@ struct Scene {
 
         //        std::cout << "wow : " << myObjects.size() << std::endl;
         for (unsigned long i = 0; i < myObjects.size(); i++) {
-            if(myObjects.at(i)->rayIntersection(ray, pTmp) < 0.f){
+            if (myObjects.at(i)->rayIntersection(ray, pTmp) < 0.f) {
                 Real dTmp = distance2(ray.origin, pTmp);
-                if(!hasTouch || dTmp < minDistance){
+                if (!hasTouch || dTmp < minDistance) {
                     hasTouch = true;
                     minDistance = dTmp;
                     object = myObjects.at(i);
                     p = pTmp;
-                    if(i == 1)
-                        std::cout << "wow : " << minDistance << " : " << i << " p : " << pTmp << std::endl;
-                    }
                 }
             }
-            return hasTouch ? -1.0f : 1.0f;
         }
+        return hasTouch ? -1.0f : 1.0f;
+    }
 
         private:
         /// Copy constructor is forbidden.

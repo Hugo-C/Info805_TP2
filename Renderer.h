@@ -119,16 +119,18 @@ namespace rt {
     /// @return the color for the given ray.
     Color trace( const Ray& ray )
     {
-      assert( ptrScene != 0 );
-      Color result = Color( 0.0, 0.0, 0.0 );
-      GraphicalObject* obj_i = 0; // pointer to intersected object
-      Point3           p_i;       // point of intersection
+      assert(ptrScene != nullptr);
+      Color result = Color(0.0, 0.0, 0.0);
+      GraphicalObject *obj_i = nullptr; // pointer to intersected object
+      Point3 p_i;       // point of intersection
 
       // Look for intersection in this direction.
-      Real ri = ptrScene->rayIntersection( ray, obj_i, p_i );
+      Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
       // Nothing was intersected
-      if ( ri >= 0.0f ) return Color( 0.0, 0.0, 0.0 ); // some background color
-      return Color( 1.0, 1.0, 1.0 );
+      if (ri >= 0.0f)
+        return Color(0.0, 0.0, 0.0); // some background color
+      Material m_i = obj_i->getMaterial(p_i);
+      return m_i.ambient + m_i.diffuse;;
     }
 
   };
