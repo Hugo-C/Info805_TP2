@@ -137,6 +137,11 @@ namespace rt {
 	  return illumination(ray, obj_i, p_i);
     }
 
+	/// Calcule le vecteur réfléchi à W selon la normale N.
+	Vector3 reflect( const Vector3& W, Vector3 N ) const{
+		 return W - 2 * (W.dot(N)) * N;  // TODO handle W.dot(N) negative (the ray is from inside)
+	}
+
     /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
     Color illumination( const Ray& ray, GraphicalObject* obj, Point3 p ){
         Material m = obj->getMaterial(p);
@@ -144,9 +149,16 @@ namespace rt {
         for (auto l : ptrScene->myLights){
             Vector3 direction = l->direction(p);
 			Vector3 n = obj->getNormal(p);
-			Real d = direction.dot(n); // FIXME ? normalize vector
-			d = std::max(0.f, d);
-			c += l->color(p) * m.diffuse * d;
+			Vector3 w = reflect(ray.direction, n);
+			Real beta = w.dot(direction); // FIXME ? normalize vectors
+			if(beta >= 0.f){ 
+				// there is a specular color
+				Real k_s = std::pow(beta, m.shinyness);
+				c += l->color(p) * m.specular * k_s;
+			}
+			Real k_d = direction.dot(n); // FIXME ? normalize vectors
+			k_d = std::max(0.f, k_d);
+			c += l->color(p) * m.diffuse * k_d;
         }
 		c += m.ambient;
 		return c;
