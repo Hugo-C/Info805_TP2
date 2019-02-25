@@ -152,6 +152,11 @@ namespace rt {
                      std::max( std::fabs( c1.g() - c2.g() ),
                                std::fabs( c1.b() - c2.b() ) ) );
   }
+
+  inline Color lerp(const Color& c1, const Color& c2, float t) {
+    t = std::max(std::min(t, 1.f), 0.f);  // clamp value
+    return c1 * (1.f - t) + c2 * t;
+  }
 } // namespace rt
 
 #endif //_COLOR_HPP_

@@ -50,6 +50,37 @@ namespace rt {
            << " " << (int)(fraction*100)<<"/100\r";
     output.flush();
   }
+
+  struct Background {
+	virtual Color backgroundColor( const Ray& ray ) = 0;
+  };
+
+  struct MyBackground : public Background {
+	Color backgroundColor( const Ray& ray ) override {
+        Real z = ray.direction.at(2);
+        if(z < 0.f){
+            Real x = -0.5f * ray.direction[ 0 ] / ray.direction[ 2 ];
+            Real y = -0.5f * ray.direction[ 1 ] / ray.direction[ 2 ];
+            Real d = sqrt( x*x + y*y );
+            Real t = std::min( d, 30.0f ) / 30.0f;
+            x -= floor( x );
+            y -= floor( y );
+            if ( ( ( x >= 0.5f ) && ( y >= 0.5f ) ) || ( ( x < 0.5f ) && ( y < 0.5f ) ) )
+                return lerp(Color( 0.2f, 0.2f, 0.2f ), Color( 1.0f, 1.0f, 1.0f ), t);
+            else
+                return lerp(Color( 0.4f, 0.4f, 0.4f ), Color( 1.0f, 1.0f, 1.0f ), t);
+        } else if (z < 0.5f){
+            Color white = Color(1.f, 1.f, 1.f);
+            Color blue = Color(0.f, 0.f, 1.f);
+            return lerp(white, blue, z * 2.f);
+        } else if (z < 1.f) {
+            Color blue = Color(0.f, 0.f, 1.f);
+            Color black = Color(0.f, 0.f, 0.f);
+            return lerp(blue, black, (z - 0.5f) * 1.5f);
+        }
+		return Color(0.f, 0.f, 0.f);
+	}
+  };
   
   /// This structure takes care of rendering a scene.
   struct Renderer {
@@ -74,8 +105,11 @@ namespace rt {
     int myWidth;
     int myHeight;
 
+	 // On rajoute un pointeur vers un objet Background
+	Background* ptrBackground;
+
     Renderer() : ptrScene( 0 ) {}
-    Renderer( Scene& scene ) : ptrScene( &scene ) {}
+    Renderer( Scene& scene, Background* background ) : ptrScene( &scene ), ptrBackground(background) {}
     void setScene( rt::Scene& aScene ) { ptrScene = &aScene; }
     
     void setViewBox( Point3 origin, 
@@ -94,6 +128,23 @@ namespace rt {
       myHeight = height;
     }
 
+	 // Affiche les sources de lumières avant d'appeler la fonction qui
+	// donne la couleur de fond.
+	Color background( const Ray& ray )
+	{
+		Color result = Color( 0.0, 0.0, 0.0 );
+		for ( Light* light : ptrScene->myLights ) {
+			Real cos_a = light->direction( ray.origin ).dot( ray.direction );
+			if ( cos_a > 0.99f ) {
+				Real a = acos( cos_a ) * 360.0 / M_PI / 8.0;
+				a = std::max( 1.0f - a, 0.0f );
+				result += light->color( ray.origin ) * a * a;
+			}
+		}
+		if ( ptrBackground != 0 )
+			result += ptrBackground->backgroundColor( ray );
+	return result;
+  }
 
     /// The main rendering routine
     void render( Image2D<Color>& image, int max_depth )
@@ -133,7 +184,7 @@ namespace rt {
       Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
       // Nothing was intersected
       if (ri >= 0.0f)
-        return Color(0.0, 0.0, 0.0); // some background color
+        return background(ray);
 	  return illumination(ray, obj_i, p_i);
     }
 
