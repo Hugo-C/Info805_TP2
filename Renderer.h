@@ -126,7 +126,6 @@ namespace rt {
     Color trace( const Ray& ray )
     {
       assert(ptrScene != nullptr);
-      Color result = Color(0.0, 0.0, 0.0);
       GraphicalObject *obj_i = nullptr; // pointer to intersected object
       Point3 p_i;       // point of intersection
 
@@ -135,8 +134,7 @@ namespace rt {
       // Nothing was intersected
       if (ri >= 0.0f)
         return Color(0.0, 0.0, 0.0); // some background color
-      Material m_i = obj_i->getMaterial(p_i);
-      return m_i.ambient + m_i.diffuse;;
+	  return illumination(ray, obj_i, p_i);
     }
 
     /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
@@ -144,8 +142,14 @@ namespace rt {
         Material m = obj->getMaterial(p);
         Color c;
         for (auto l : ptrScene->myLights){
-            Vector3 d = l->direction(p);
+            Vector3 direction = l->direction(p);
+			Vector3 n = obj->getNormal(p);
+			Real d = direction.dot(n); // FIXME ? normalize vector
+			d = std::max(0.f, d);
+			c += l->color(p) * m.diffuse * d;
         }
+		c += m.ambient;
+		return c;
     }
 
   };
