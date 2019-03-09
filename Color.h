@@ -153,6 +153,10 @@ namespace rt {
                                std::fabs( c1.b() - c2.b() ) ) );
   }
 
+
+    inline bool operator==(const Color& c1, const Color& c2){ return distance(c1, c2) == 0; }
+    inline bool operator!=(const Color& c1, const Color& c2){ return !(c1 == c2); }
+
   inline Color lerp(const Color& c1, const Color& c2, float t) {
     t = std::max(std::min(t, 1.f), 0.f);  // clamp value
     return c1 * (1.f - t) + c2 * t;

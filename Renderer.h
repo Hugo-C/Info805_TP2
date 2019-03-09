@@ -193,26 +193,58 @@ namespace rt {
 		 return W - 2 * (W.dot(N)) * N;  // TODO handle W.dot(N) negative (the ray is from inside)
 	}
 
-    /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
-    Color illumination( const Ray& ray, GraphicalObject* obj, Point3 p ){
-        Material m = obj->getMaterial(p);
-        Color c;
-        for (auto l : ptrScene->myLights){
-            Vector3 direction = l->direction(p);
-			Vector3 n = obj->getNormal(p);
-			Vector3 w = reflect(ray.direction, n);
-			Real beta = w.dot(direction); // FIXME ? normalize vectors
-			if(beta >= 0.f){ 
-				// there is a specular color
-				Real k_s = std::pow(beta, m.shinyness);
-				c += l->color(p) * m.specular * k_s;
-			}
-			Real k_d = direction.dot(n); // FIXME ? normalize vectors
-			k_d = std::max(0.f, k_d);
-			c += l->color(p) * m.diffuse * k_d;
+      /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
+      Color illumination(const Ray& ray, GraphicalObject *obj, Point3 p) {
+          Material m = obj->getMaterial(p);
+          Color c;
+          for (auto l : ptrScene->myLights) {
+              Vector3 direction = l->direction(p);
+              Vector3 n = obj->getNormal(p);
+              Vector3 w = reflect(ray.direction, n);
+              //if (std::abs(w.dot(l->direction(p)) - 1.f) <= 0.25f) {
+              Color lightColor = l->color(p);
+              Ray rayReflected(p, w);
+              Color shadow_color = shadow(rayReflected, lightColor);
+              if (shadow_color != lightColor) {
+                  return shadow_color;
+              } else {
+                  Real beta = w.dot(direction); // FIXME ? normalize vectors
+                  if (beta >= 0.f) {  // there is a specular color
+                      Real k_s = std::pow(beta, m.shinyness);
+                      c += l->color(p) * m.specular * k_s;
+                  }
+              }
+              Real k_d = direction.dot(n);
+              k_d = std::max(0.f, k_d);
+              c += l->color(p) * m.diffuse * k_d;
+          }
+          c += m.ambient;
+          return c;
+      }
+
+    /// Calcule la couleur de la lumière (donnée par light_color) dans la
+    /// direction donnée par le rayon. Si aucun objet n'est traversé,
+    /// retourne light_color, sinon si un des objets traversés est opaque,
+    /// retourne du noir, et enfin si les objets traversés sont
+    /// transparents, attenue la couleur.
+    Color shadow(const Ray& ray, Color light_color){
+        Ray rayTmp = ray;
+        Color c = light_color;
+        while(c.max() > 0.003f){  // tant que la couleur n'est pas noire
+            rayTmp.origin = rayTmp.origin + rayTmp.direction;  // on évite d'intersecter l'objet de départ
+            //std::cout << rayTmp.origin << " vs " << ray.origin << " " << rayTmp.direction << std::endl;
+            GraphicalObject *obj_i = nullptr;  // pointer to intersected object
+            Point3 p_i;   // point of intersection
+
+            if(ptrScene->rayIntersection(rayTmp, obj_i, p_i) < 0.f){
+                Material m = obj_i->getMaterial(p_i);
+                c = c * m.coef_diffusion * m.coef_refraction;
+                rayTmp.origin = p_i;
+            } else {
+                break;  // le rayon n'intersecte pas avec un objet
+            }
         }
-		c += m.ambient;
-		return c;
+        return c;
     }
 
   };

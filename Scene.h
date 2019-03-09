@@ -78,6 +78,8 @@ struct Scene {
     }
     
     /// returns the closest object intersected by the given ray.
+    /// p is the point where intersection happened
+    /// return negative value if an intersection happened else a positive one
     Real
     rayIntersection( const Ray& ray,
                      GraphicalObject*& object, Point3& p )
