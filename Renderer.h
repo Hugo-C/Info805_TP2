@@ -173,13 +173,24 @@ namespace rt {
             assert(ptrScene != nullptr);
             GraphicalObject *obj_i = nullptr; // pointer to intersected object
             Point3 p_i;       // point of intersection
+            Color res(0, 0, 0);
 
             // Look for intersection in this direction.
             Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
             // Nothing was intersected
             if (ri >= 0.0f)
                 return background(ray);
-            Color res = illumination(ray, obj_i, p_i);
+            
+            // gestion de la réflexion
+            const Material& m = obj_i->getMaterial(p_i);
+            if(ray.depth > 0 && m.coef_reflexion != 0){
+                Vector3 direction_refl = reflect(ray.direction, obj_i->getNormal(p_i));
+                Ray ray_refl(p_i, direction_refl, ray.depth - 1);
+                Color C_refl = trace(ray_refl);
+                res += C_refl * m.specular * m.coef_reflexion;
+            }
+
+            res += illumination(ray, obj_i, p_i);
             for (auto l : ptrScene->myLights) {
                 Vector3 rayToLight = l->direction(p_i);
                 Ray myRay(p_i, rayToLight);
