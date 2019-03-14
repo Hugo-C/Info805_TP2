@@ -181,13 +181,20 @@ namespace rt {
             if (ri >= 0.0f)
                 return background(ray);
             
-            // gestion de la réflexion
+            // gestion de la réflexion et de la refraction
             const Material& m = obj_i->getMaterial(p_i);
-            if(ray.depth > 0 && m.coef_reflexion != 0){
-                Vector3 direction_refl = reflect(ray.direction, obj_i->getNormal(p_i));
-                Ray ray_refl(p_i, direction_refl, ray.depth - 1);
-                Color C_refl = trace(ray_refl);
-                res += C_refl * m.specular * m.coef_reflexion;
+            if(ray.depth > 0){
+                if(m.coef_reflexion != 0){
+                    Vector3 direction_refl = reflect(ray.direction, obj_i->getNormal(p_i));
+                    Ray ray_refl(p_i, direction_refl, ray.depth - 1);
+                    Color C_refl = trace(ray_refl);
+                    res += C_refl * m.specular * m.coef_reflexion;
+                }
+                if(m.coef_refraction != 0){
+                    Ray ray_refraction = refractionRay(ray, p_i, obj_i->getNormal(p_i), m);
+                    Color C_refraction = trace(ray_refraction);
+                    res += C_refraction * m.diffuse * m.coef_refraction;
+                }
             }
 
             res += illumination(ray, obj_i, p_i);
@@ -205,6 +212,22 @@ namespace rt {
         /// Calcule le vecteur réfléchi à W selon la normale N.
         Vector3 reflect(const Vector3& W, Vector3 N) const {
             return W - 2 * (W.dot(N)) * N;  // TODO handle W.dot(N) negative (the ray is from inside)
+        }
+
+        Ray refractionRay( const Ray& aRay, const Point3& p, Vector3 N, const Material& m ){
+            Vector3 V = aRay.direction;
+            Real r;
+            bool isFromOutside = V.dot(N) < 0;
+            if(isFromOutside){
+                r = m.in_refractive_index / m.out_refractive_index;
+            } else {
+                r = m.out_refractive_index / m.in_refractive_index;
+                N = Vector3(0, 0, 0) - N;
+            }
+            Real c = (Vector3(0, 0, 0) - N).dot(V);
+
+            Vector3 v_refract = r * V + ((Real) (r * c - (sqrt(1 - r * r * (1 - c * c))))) * N;
+            return Ray(p, v_refract, aRay.depth - 1);
         }
 
         /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
