@@ -186,7 +186,7 @@ namespace rt {
             if(ray.depth > 0){
                 if(m.coef_reflexion != 0){
                     Vector3 direction_refl = reflect(ray.direction, obj_i->getNormal(p_i));
-                    Ray ray_refl(p_i, direction_refl, ray.depth - 1);
+                    Ray ray_refl(p_i + direction_refl, direction_refl, ray.depth - 1);
                     Color C_refl = trace(ray_refl);
                     res += C_refl * m.specular * m.coef_reflexion;
                 }
