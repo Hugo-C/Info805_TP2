@@ -192,8 +192,10 @@ namespace rt {
                 }
                 if(m.coef_refraction != 0){
                     Ray ray_refraction = refractionRay(ray, p_i, obj_i->getNormal(p_i), m);
-                    Color C_refraction = trace(ray_refraction);
-                    res += C_refraction * m.diffuse * m.coef_refraction;
+                    if(ray_refraction.depth > 0){
+                        Color C_refraction = trace(ray_refraction);
+                        res += C_refraction * m.diffuse * m.coef_refraction;
+                    }
                 }
             }
 
@@ -203,7 +205,7 @@ namespace rt {
 
         /// Calcule le vecteur réfléchi à W selon la normale N.
         Vector3 reflect(const Vector3& W, Vector3 N) const {
-            return W - 2 * (W.dot(N)) * N;  // TODO handle W.dot(N) negative (the ray is from inside)
+            return W - 2 * (W.dot(N)) * N;
         }
 
         Ray refractionRay( const Ray& aRay, const Point3& p, Vector3 N, const Material& m ){
@@ -218,8 +220,12 @@ namespace rt {
             }
             Real c = (Vector3(0, 0, 0) - N).dot(V);
 
-            Vector3 v_refract = r * V + ((Real) (r * c - (sqrt(1 - r * r * (1 - c * c))))) * N;
-            return Ray(p, v_refract, aRay.depth - 1);
+            Real x = 1 - r * r * (1 - c * c);
+            if(x < 0)
+                return Ray(Point3(), Vector3(), -1);  // no refraction ray
+
+            Vector3 v_refract = r * V + ((Real) (r * c - (sqrt(x)))) * N;
+            return Ray(p + v_refract, v_refract, aRay.depth - 1);
         }
 
         /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
@@ -239,11 +245,15 @@ namespace rt {
                 if (beta >= 0.f) {
                     // there is a specular color
                     Real k_s = std::pow(beta, m.shinyness);
-                    c += light_color * m.specular * k_s;
+                    c += light_color * m.specular * m.coef_reflexion * k_s;
                 }
                 Real k_d = direction.dot(n); // FIXME ? normalize vectors
                 k_d = std::max(0.f, k_d);
-                c += light_color * m.diffuse * k_d;
+                if(ray.depth == 0){
+                    c += light_color * m.diffuse * k_d;
+                } else {
+                    c += light_color * m.diffuse * m.coef_diffusion * k_d;
+                }
             }
             c += m.ambient;
             return c;
