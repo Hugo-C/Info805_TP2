@@ -225,7 +225,9 @@ namespace rt {
                 return Ray(Point3(), Vector3(), -1);  // no refraction ray
 
             Vector3 v_refract = r * V + ((Real) (r * c - (sqrt(x)))) * N;
-            return Ray(p + v_refract, v_refract, aRay.depth - 1);
+            v_refract = v_refract / v_refract.norm();
+            Real coef = 0.000001;
+            return Ray(p + coef * v_refract, v_refract, aRay.depth - 1);
         }
 
         /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
@@ -268,7 +270,7 @@ namespace rt {
             Ray rayTmp = ray;
             Color c = light_color;
             while (c.max() > 0.003f) {  // tant que la couleur n'est pas noire
-                rayTmp.origin = rayTmp.origin + rayTmp.direction;  // on évite d'intersecter l'objet de départ
+                rayTmp.origin = rayTmp.origin + (Real)0.0001 * rayTmp.direction;  // on évite d'intersecter l'objet de départ
                 //std::cout << rayTmp.origin << " vs " << ray.origin << " " << rayTmp.direction << std::endl;
                 GraphicalObject *obj_i = nullptr;  // pointer to intersected object
                 Point3 p_i;   // point of intersection
