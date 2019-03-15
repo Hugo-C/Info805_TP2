@@ -198,14 +198,6 @@ namespace rt {
             }
 
             res += illumination(ray, obj_i, p_i);
-            for (auto l : ptrScene->myLights) {
-                Vector3 rayToLight = l->direction(p_i);
-                Ray myRay(p_i, rayToLight);
-                const Color& light_color = l->color(p_i);  // FIXME Vector3(0, 0, 0) - ...
-                Color shadow_color = shadow(myRay, light_color);
-                if(shadow_color != light_color && shadow_color.max() > 0.003f)  // FIXME
-                    res = res * shadow_color;
-            }
             return res;
         }
 
@@ -238,15 +230,20 @@ namespace rt {
                 Vector3 direction = l->direction(p);
                 Vector3 n = obj->getNormal(p);
                 Vector3 w = reflect(ray.direction, n);
+
+                //handle shadows
+                Color light_color = l->color(p);
+                light_color = shadow(Ray(p, direction), light_color);
+
                 Real beta = w.dot(direction); // FIXME ? normalize vectors
                 if (beta >= 0.f) {
                     // there is a specular color
                     Real k_s = std::pow(beta, m.shinyness);
-                    c += l->color(p) * m.specular * k_s;
+                    c += light_color * m.specular * k_s;
                 }
                 Real k_d = direction.dot(n); // FIXME ? normalize vectors
                 k_d = std::max(0.f, k_d);
-                c += l->color(p) * m.diffuse * k_d;
+                c += light_color * m.diffuse * k_d;
             }
             c += m.ambient;
             return c;
@@ -268,7 +265,7 @@ namespace rt {
 
                 if (ptrScene->rayIntersection(rayTmp, obj_i, p_i) < 0.f) {
                     Material m = obj_i->getMaterial(p_i);
-                    c = c * m.coef_diffusion * m.coef_refraction;
+                    c = c * m.diffuse * m.coef_refraction;
                     rayTmp.origin = p_i;
                 } else {
                     return c; // le rayon n'intersecte pas avec un objet
