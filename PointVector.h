@@ -80,7 +80,14 @@ namespace rt {
       for ( Size i = 0; i < N; i++ )
         out << (*this)[ i ] << ( ( i < N-1 ) ? ',' : ')' );
     }
-  
+
+    Self operator-() const
+    {
+        Self res;
+        for ( Size i = 0; i < N; ++i ) res[i] = - (*this)[ i ];
+        return res;
+    }
+
     Self& operator+=( const Self& other )
     {
       for ( Size i = 0; i < N; ++i ) (*this)[ i ] += other[ i ];

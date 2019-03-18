@@ -186,7 +186,7 @@ namespace rt {
             if(ray.depth > 0){
                 if(m.coef_reflexion != 0){
                     Vector3 direction_refl = reflect(ray.direction, obj_i->getNormal(p_i));
-                    Ray ray_refl(p_i + direction_refl, direction_refl, ray.depth - 1);
+                    Ray ray_refl(p_i + direction_refl * 0.001f, direction_refl, ray.depth - 1);
                     Color C_refl = trace(ray_refl);
                     res += C_refl * m.specular * m.coef_reflexion;
                 }
@@ -213,12 +213,12 @@ namespace rt {
             Real r;
             bool isFromOutside = V.dot(N) < 0;
             if(isFromOutside){
-                r = m.in_refractive_index / m.out_refractive_index;
-            } else {
                 r = m.out_refractive_index / m.in_refractive_index;
-                N = Vector3(0, 0, 0) - N;
+            } else {
+                r = m.in_refractive_index / m.out_refractive_index;
+                N = -N;
             }
-            Real c = (Vector3(0, 0, 0) - N).dot(V);
+            Real c = (-N).dot(V);
 
             Real x = 1 - r * r * (1 - c * c);
             if(x < 0)
@@ -226,8 +226,7 @@ namespace rt {
 
             Vector3 v_refract = r * V + ((Real) (r * c - (sqrt(x)))) * N;
             v_refract = v_refract / v_refract.norm();
-            Real coef = 0.000001;
-            return Ray(p + coef * v_refract, v_refract, aRay.depth - 1);
+            return Ray(p + v_refract * 0.01f, v_refract, aRay.depth - 1);
         }
 
         /// Calcule l'illumination de l'objet \a obj au point \a p, sachant que l'observateur est le rayon \a ray.
@@ -270,8 +269,7 @@ namespace rt {
             Ray rayTmp = ray;
             Color c = light_color;
             while (c.max() > 0.003f) {  // tant que la couleur n'est pas noire
-                rayTmp.origin = rayTmp.origin + (Real)0.0001 * rayTmp.direction;  // on évite d'intersecter l'objet de départ
-                //std::cout << rayTmp.origin << " vs " << ray.origin << " " << rayTmp.direction << std::endl;
+                rayTmp.origin = rayTmp.origin + 0.0001f * rayTmp.direction;  // on évite d'intersecter l'objet de départ
                 GraphicalObject *obj_i = nullptr;  // pointer to intersected object
                 Point3 p_i;   // point of intersection
 
