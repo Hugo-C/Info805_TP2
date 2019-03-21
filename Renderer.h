@@ -14,6 +14,9 @@
 #include "GraphicalObject.h"
 #include "PointVector.h"
 #include "Scene.h"
+#include <iostream>
+#include <string>
+
 
 
 /// Namespace RayTracer
@@ -55,6 +58,8 @@ namespace rt {
     };
 
     struct MyBackground : public Background {
+        Image2D<Color> img;
+        MyBackground(Image2D<Color> img) : img(img){}
         Color backgroundColor(const Ray& ray) override {
             Real z = ray.direction.at(2);
             if (z < 0.f) {
@@ -68,18 +73,16 @@ namespace rt {
                     return lerp(Color(0.2f, 0.2f, 0.2f), Color(1.0f, 1.0f, 1.0f), t);
                 else
                     return lerp(Color(0.4f, 0.4f, 0.4f), Color(1.0f, 1.0f, 1.0f), t);
-            } else if (z < 0.5f) {
-                Color white = Color(1.f, 1.f, 1.f);
-                Color blue = Color(0.f, 0.f, 1.f);
-                return lerp(white, blue, z * 2.f);
-            } else if (z < 1.f) {
-                Color blue = Color(0.f, 0.f, 1.f);
-                Color black = Color(0.f, 0.f, 0.f);
-                return lerp(blue, black, (z - 0.5f) * 1.5f);
+            } else{
+                int x = static_cast<int>((0.5f + (ray.direction.at(0) / 2)) * img.w());
+                int y = static_cast<int>((0.5f + (ray.direction.at(1) / 2)) * img.h());
+                return img.at(x, y);
             }
             return Color(0.f, 0.f, 0.f);
         }
     };
+
+
 
     /// This structure takes care of rendering a scene.
     struct Renderer {

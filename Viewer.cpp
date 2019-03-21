@@ -8,6 +8,7 @@
 #include "Renderer.h"
 #include "Image2D.h"
 #include "Image2DWriter.h"
+#include "Image2DReader.h"
 
 using namespace std;
 
@@ -62,7 +63,18 @@ rt::Viewer::keyPressEvent(QKeyEvent *e)
     {
       int w = camera()->screenWidth();
       int h = camera()->screenHeight();
-	  MyBackground bg;
+
+      Image2D<Color> img;
+
+      std::ifstream input("../TP2/sky.ppm");
+      bool ok1 = Image2DReader<Color>::read(img, input, false);
+      if (!ok1) {
+          std::cerr << "Error reading input file." << std::endl;
+      }
+      input.close();
+
+      MyBackground bg(img);
+
       Renderer renderer( *ptrScene, &bg );
       qglviewer::Vec orig, dir;
       camera()->convertClickToLine( QPoint( 0,0 ), orig, dir );
