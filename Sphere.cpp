@@ -112,8 +112,6 @@ rt::Sphere::rayIntersection( const Ray& ray, Point3& p )
         return 1.0f;  // the ray start after the sphere
 
     Real t = t1 > 0 ? t1 : t2;
-    p = Point3(ray.origin[0] + ray.direction[0] * t,
-               ray.origin[1] + ray.direction[1] * t,
-               ray.origin[2] + ray.direction[2] * t);
+    p = ray.origin + t * ray.direction;
     return -1.0f;
 }

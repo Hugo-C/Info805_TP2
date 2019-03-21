@@ -78,6 +78,6 @@ rt::Real rt::PeriodicPlane::rayIntersection(const rt::Ray& ray, rt::Point3& p) {
     if(gamma <= epsilon)
         return 1.f;  // no intersection, the ray is pointing the other way
 
-    p = this->c + gamma * ray.direction;
+    p = ray.origin + gamma * ray.direction;
     return -1.f;
 }
