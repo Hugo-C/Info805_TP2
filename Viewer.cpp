@@ -66,7 +66,7 @@ rt::Viewer::keyPressEvent(QKeyEvent *e)
 
       Image2D<Color> img;
 
-      std::ifstream input("../TP2/sky.ppm");
+      std::ifstream input("../TP2/sky.ppm", std::ifstream::binary);
       bool ok1 = Image2DReader<Color>::read(img, input, false);
       if (!ok1) {
           std::cerr << "Error reading input file." << std::endl;

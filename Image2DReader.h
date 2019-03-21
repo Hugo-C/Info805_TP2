@@ -88,7 +88,7 @@ public:
 
         unsigned char g;
         std::string str;
-        std::getline(input, str);       
+        std::getline(input, str);
 
         bool asciimode = false;
         if (str == "P2") {
@@ -100,7 +100,7 @@ public:
         if (str[0] == '#')
             std::getline(input, str);
 
-        std::istringstream ss(str);      
+        std::istringstream ss(str);
         int w, h;
         ss >> w >> h;
         img = Image2D<Color>(w, h);
@@ -113,7 +113,6 @@ public:
         else {
             input >> std::noskipws;
         }
-
         for (auto it = img.begin(), itE = img.end(); it != itE; ++it) {
 
             unsigned char r, g, b;
@@ -121,7 +120,6 @@ public:
             Color c(static_cast<float>(r)/255.0f, static_cast<float>(g)/255.0f, static_cast<float>(b)/255.0f);
             *it = c;
         }
-
         return true;
     }
 };

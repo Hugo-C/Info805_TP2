@@ -78,7 +78,6 @@ namespace rt {
                 int y = static_cast<int>((0.5f + (ray.direction.at(1) / 2)) * img.h());
                 return img.at(x, y);
             }
-            return Color(0.f, 0.f, 0.f);
         }
     };
 
