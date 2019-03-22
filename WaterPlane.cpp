@@ -13,14 +13,14 @@ namespace rt {
     Vector3 WaterPlane::getNormal(Point3 p) {
         Real x, y;
         this->coordinates(p, x, y);
-        Vector3 res = PeriodicPlane::getNormal(p);
+        Vector3 n = PeriodicPlane::getNormal(p);
         Real distortion = 0.f;
         for(auto aWave : myWaves){
             Real t = x * cos(aWave.a) + y * sin(aWave.a);
             distortion += aWave.r * cos(2 * M_PI * t / aWave.l + aWave.phi);
         }
-        res *= distortion;
-        return res / res.norm();
+        n[2] = distortion;
+        return n;
     }
 
     Material WaterPlane::getMaterial(Point3 /* p */) {
