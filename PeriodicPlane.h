@@ -24,8 +24,8 @@ namespace rt {
         /// tangent to \a u and \a v. Then \a w defines the width of the
         /// band around (0,0) and its period to put material \a band_m,
         /// otherwise \a main_m is used.
-        PeriodicPlane(Point3 c, Vector3 u, Vector3 v,
-                      Material main_m, Material band_m, Real w);
+        PeriodicPlane(Point3 _c, Vector3 _u, Vector3 _v,
+                      Material _main_m, Material _band_m, Real w);
 
         /// Etant donné un point \a p dans le plan, retourne ses coordonnées \a x et \a y selon \a u et \a v.
         void coordinates(Point3 p, Real& x, Real& y);

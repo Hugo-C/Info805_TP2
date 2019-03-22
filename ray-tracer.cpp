@@ -47,14 +47,16 @@ int main(int argc, char **argv) {
     addBubble(scene, Point3(-5, 4, -1), 2.0, Material::glass());
 
     // Un sol noir et blanc
-//    PeriodicPlane* pplane1 = new PeriodicPlane( Point3( 0, 0, -5 ), Vector3( 5, 0, 0 ), Vector3( 0, 5, 0 ),
-//                                               Material::whitePlastic(), Material::redPlastic(), 0.05f );
-//    scene.addObject(pplane1);
+    PeriodicPlane* pplane1 = new PeriodicPlane( Point3( 0, 0, -5 ), Vector3( 5, 0, 0 ), Vector3( 0, 5, 0 ),
+                                               Material::blueWater(), Material::whitePlastic(), 0.05f );
+    scene.addObject(pplane1);
+    std::cout << "n plane : " << pplane1->getNormal(Point3(0, 0, 0)) <<  " => " << Vector3( 5, 0, 0 ).cross(Vector3( 0, 5, 0 )) << std::endl;
 
     // Un mur de building "moderne" à gauche.
     PeriodicPlane* pplane2 = new PeriodicPlane( Point3( -15, 0, 0 ), Vector3( 0, 2, 0 ), Vector3( 0, 0, 4 ),
-                                               Material::bronze(), Material::emerald(), 0.025f );
+                                               Material::silver(), Material::black_plastic(), 0.025f );
     scene.addObject(pplane2);
+
 
     // Instantiate the viewer.
     Viewer viewer;
