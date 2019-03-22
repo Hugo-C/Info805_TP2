@@ -48,12 +48,12 @@ int main(int argc, char **argv) {
     addBubble(scene, Point3(-5, 4, -1), 2.0, Material::glass());
 
     // Un sol effet piscine
-    PeriodicPlane* pplane1 = new PeriodicPlane( Point3( 0, 0, -5 ), Vector3( 5, 0, 0 ), Vector3( 0, 5, 0 ),
+    PeriodicPlane* pplane1 = new PeriodicPlane( Point3( 0, 0, -2.5 ), Vector3( 5, 0, 0 ), Vector3( 0, 5, 0 ),
                                                Material::blueWater(), Material::whitePlastic(), 0.05f );
     scene.addObject(pplane1);
 
     // Une mer calme
-    auto * sea = new WaterPlane(Point3( 0, 0, -3 ), Vector3( 5, 0, 0 ), Vector3( 0, 5, 0 ), Material::blueWater());
+    auto * sea = new WaterPlane(Point3( 0, 0, -2 ), Vector3( 5, 0, 0 ), Vector3( 0, 5, 0 ), Material::blueWater());
     scene.addObject(sea);
 
 

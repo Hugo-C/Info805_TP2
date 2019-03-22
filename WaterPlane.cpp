@@ -1,4 +1,6 @@
 #include "WaterPlane.h"
+#include "worley.h"
+
 namespace rt {
     WaveData::WaveData(float r, float a, float l, float phi) : r(r), a(a), l(l), phi(phi) { }
 
@@ -15,10 +17,17 @@ namespace rt {
         this->coordinates(p, x, y);
         Vector3 n = PeriodicPlane::getNormal(p);
         Real distortion = 0.f;
+
+        // we process some waves
         for(auto aWave : myWaves){
             Real t = x * cos(aWave.a) + y * sin(aWave.a);
             distortion += aWave.r * cos(2 * M_PI * t / aWave.l + aWave.phi);
         }
+
+        // then add worley noise
+        double pos[3] = {p[0] * 2.f, p[1] * 2.f, p[2] * 2.f};
+        distortion += static_cast<float>(Worley(pos) * 0.75f);
+
         n[2] = distortion;
         return n;
     }
