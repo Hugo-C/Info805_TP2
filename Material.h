@@ -140,6 +140,50 @@ namespace rt {
       m.out_refractive_index = 1.0f;
       return m;
     }
+      static Material blueWater()
+      {
+        Material m;
+        m.ambient   = Color( 0.1, 0.1, 0.2 );
+        m.diffuse   = Color( 0.1, 0.6, 0.8 );
+        m.specular  = Color( 1.0, 1.0, 1.0 );
+        m.shinyness = 70.0f;
+        m.coef_diffusion  = 0.01f;
+        m.coef_reflexion  = 0.2f;
+        m.coef_refraction = 0.8f;
+        m.in_refractive_index  = 1.3f;
+        m.out_refractive_index = 1.0f;
+        return m;
+      }
+
+      static Material silver()
+      {
+          Material m;
+          m.ambient   = Color( 0.19225, 0.19225, 0.19225 );
+          m.diffuse   = Color( 0.50754, 0.50754, 0.50754 );
+          m.specular  = Color( 0.508273, 0.508273, 0.508273 );
+          m.shinyness = 0.4f * 128.f;
+          m.coef_diffusion  = 0.01f;
+          m.coef_reflexion  = 0.2f;
+          m.coef_refraction = 0.8f;
+          m.in_refractive_index  = 1.3f;
+          m.out_refractive_index = 1.0f;
+          return m;
+      }
+
+      static Material black_plastic()
+      {
+          Material m;
+          m.ambient   = Color( 0.0, 0.0, 0.0 );
+          m.diffuse   = Color( 0.01, 0.01, 0.01 );
+          m.specular  = Color( 0.5, 0.5, 0.5 );
+          m.shinyness = 0.25f * 128.f;
+          m.coef_diffusion  = 0.01f;
+          m.coef_reflexion  = 0.2f;
+          m.coef_refraction = 0.8f;
+          m.in_refractive_index  = 1.3f;
+          m.out_refractive_index = 1.0f;
+          return m;
+      }
   };
 
   

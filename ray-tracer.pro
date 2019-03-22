@@ -13,10 +13,10 @@ QMAKE_CXXFLAGS += -std=c++11
 # Noms de vos fichiers entete
 HEADERS = Viewer.h PointVector.h Color.h Sphere.h GraphicalObject.h Light.h \
           Material.h PointLight.h Image2D.h Image2DWriter.h Renderer.h Ray.h \
-          Scene.h
+          Scene.h PeriodicPlane.h worley.h WaterPlane.h
           
 # Noms de vos fichiers source
-SOURCES = Viewer.cpp ray-tracer.cpp Sphere.cpp 
+SOURCES = Viewer.cpp ray-tracer.cpp Sphere.cpp PeriodicPlane.cpp worley.cpp WaterPlane.cpp
 
 ###########################################################
 # Commentez/decommentez selon votre config/systeme

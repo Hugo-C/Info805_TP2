@@ -6,8 +6,10 @@
 #include "Viewer.h"
 #include "Scene.h"
 #include "Sphere.h"
+#include "PeriodicPlane.h"
 #include "Material.h"
 #include "PointLight.h"
+#include "WaterPlane.h"
 
 using namespace std;
 using namespace rt;
@@ -44,6 +46,22 @@ int main(int argc, char **argv) {
     scene.addObject(sphere2);
     scene.addObject(sphere3);
     addBubble(scene, Point3(-5, 4, -1), 2.0, Material::glass());
+
+    // Un sol effet piscine
+    PeriodicPlane* pplane1 = new PeriodicPlane( Point3( 0, 0, -2.5 ), Vector3( 5, 0, 0 ), Vector3( 0, 5, 0 ),
+                                               Material::blueWater(), Material::whitePlastic(), 0.05f );
+    scene.addObject(pplane1);
+
+    // Une mer calme
+    auto * sea = new WaterPlane(Point3( 0, 0, -2 ), Vector3( 5, 0, 0 ), Vector3( 0, 5, 0 ), Material::blueWater());
+    scene.addObject(sea);
+
+
+//    // Un mur de building "moderne" à gauche.
+//    PeriodicPlane* pplane2 = new PeriodicPlane( Point3( -15, 0, 0 ), Vector3( 0, 2, 0 ), Vector3( 0, 0, 4 ),
+//                                               Material::silver(), Material::black_plastic(), 0.025f );
+//    scene.addObject(pplane2);
+
 
     // Instantiate the viewer.
     Viewer viewer;
